@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { Colors } from '../../assets/scripts/colors.js';
 
 const SearchBar = ({ onChangeText, onEndEditing, value }) => {
   return (
     <View style={styles.container}>
-      <Feather name="search" size={22} color="#96d5c9" />
+      <Feather name="search" size={22} color="#a4d7c8" />
       <TextInput
         autoCapitalize="none"
         autoCorrect={false}
@@ -15,10 +16,8 @@ const SearchBar = ({ onChangeText, onEndEditing, value }) => {
         onChangeText={newText => onChangeText(newText)}
         onEndEditing={() => onEndEditing(value)}
       />
-      <TouchableOpacity
-        onPress={() => onEndEditing(value)}
-      >
-        <Feather name="send" size={22} color="#96d5c9" />
+      <TouchableOpacity onPress={() => onEndEditing(value)}>
+        <Feather name="send" size={22} color="#a4d7c8" />
       </TouchableOpacity>
     </View>
   )
@@ -29,7 +28,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 10,
     borderRadius: 10,
-    backgroundColor: '#eaeaea',
+    backgroundColor: Colors.lightGray,
     margin: 10,
     alignItems: 'center',
   },
@@ -37,6 +36,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     flex: 1,
     marginLeft: 10,
+    color: Colors.white,
   }
 });
 
