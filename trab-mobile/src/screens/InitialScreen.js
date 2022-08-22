@@ -1,42 +1,49 @@
 import * as React from 'react';
 import { StatusBar, FlatList, Image, Animated, Text, View, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import carouselData from '../../assets/scripts/carouselData';
+import { Feather } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('screen');
 
 const InitialScreen = ({ navigation }) => {
   return (
     <>
-      <View style={ styles.container }>
+      <View style={styles.container}>
         <StatusBar hidden />
-        <FlatList 
+        <FlatList
           horizontal
           pagingEnabled
-          data={ carouselData }
-          onScroll={ Animated.event(
-            [{ nativeEvent: { contentOffset: { x: scrollX }}}],
+          showsHorizontalScrollIndicator={false}
+          data={carouselData}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
             { useNativeDriver: true }
           )}
           keyExtractor={(_, index) => index.toString()}
           renderItem={({ item }) => {
             return <>
-                <View style={ styles.imgContainer }>
-                  <Image
-                    source={require(`../../assets/images/` + item.source)}
-                    title={item.title}
-                    style={ styles.images }
-                  />
-                  <Text style={styles.description}>
-                    {item.description}
-                  </Text>
-                </View>
-              </>
+              <View style={styles.imgContainer}>
+                <Image
+                  source={require(`../../assets/images/` + item.source)}
+                  title={item.title}
+                  style={styles.images}
+                />
+                <Text style={styles.description}>
+                  {item.description}
+                </Text>
+              </View>
+            </>
           }}>
         </FlatList>
+        <View style={styles.dots}>
+          <Feather name="circle" size={5} color="#96d5c9" />
+          <Feather name="circle" size={5} color="#96d5c9" />
+          <Feather name="circle" size={5} color="#96d5c9" />
+        </View>
         <TouchableOpacity
           style={styles.btnLogarCtn}
           onPress={() => navigation.navigate("Home")}>
-            <Text style={styles.btnLogar}>Logar</Text>
+          <Text style={styles.btnLogar}>Logar</Text>
         </TouchableOpacity>
       </View>
     </>
@@ -52,11 +59,11 @@ const styles = StyleSheet.create({
     width,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 100
+    paddingTop: 150
   },
   images: {
     width: 150,
-    height: 150   
+    height: 150
   },
   description: {
     width: 200,
@@ -66,10 +73,10 @@ const styles = StyleSheet.create({
   btnLogarCtn: {
     justifyContent: 'center',
     alignItems: 'center',
-    flex:1   
+    flex: 1
   },
   btnLogar: {
-    backgroundColor: '#97d5c9',
+    backgroundColor: '#96d5c9',
     borderRadius: 5,
     height: 30,
     width: 180,
@@ -78,6 +85,13 @@ const styles = StyleSheet.create({
     color: '#20302d',
     textAlign: 'center',
     marginTop: 0
+  },
+  dots: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignSelf: 'center',
+    width: 50
   }
 });
 

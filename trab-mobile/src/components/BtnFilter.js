@@ -9,9 +9,9 @@ const BtnFilter = ({ value }) => {
 
 const styles = StyleSheet.create({
   txt: {
-    color: 'red',
+    color: '#6bada0',
     borderRadius: 100,
-    borderColor: 'red',
+    borderColor: '#6bada0',
     borderWidth: 1,
     width: 80,
     margin: 30,
