@@ -2,6 +2,7 @@ import * as React from 'react';
 import { StatusBar, FlatList, Image, Animated, Text, View, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import carouselData from '../../assets/scripts/carouselData';
 import { Feather } from '@expo/vector-icons';
+import { Colors } from '../../assets/scripts/colors.js';
 
 const { width } = Dimensions.get('screen');
 
@@ -10,24 +11,28 @@ const InitialScreen = ({ navigation }) => {
     <>
       <View style={styles.container}>
         <StatusBar hidden />
+        <View style={styles.logo}>
+          <Feather name="film" size={20} color={Colors.lightGreen} />
+          <Text style={styles.logoText}>TMBD</Text>
+        </View>
+
         <FlatList
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
           data={carouselData}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-            { useNativeDriver: true }
-          )}
           keyExtractor={(_, index) => index.toString()}
           renderItem={({ item }) => {
             return <>
               <View style={styles.imgContainer}>
-                <Image
+                <Feather name={item.icon} size={50} color={Colors.lightGreen} />
+                {/*
+                 <Image
                   source={require(`../../assets/images/` + item.source)}
                   title={item.title}
                   style={styles.images}
                 />
+                */}
                 <Text style={styles.description}>
                   {item.description}
                 </Text>
@@ -36,9 +41,9 @@ const InitialScreen = ({ navigation }) => {
           }}>
         </FlatList>
         <View style={styles.dots}>
-          <Feather name="circle" size={5} color="#96d5c9" />
-          <Feather name="circle" size={5} color="#96d5c9" />
-          <Feather name="circle" size={5} color="#96d5c9" />
+          <Feather name="circle" size={5} color={Colors.lightGreen} />
+          <Feather name="circle" size={5} color={Colors.lightGreen} />
+          <Feather name="circle" size={5} color={Colors.lightGreen} />
         </View>
         <TouchableOpacity
           style={styles.btnLogarCtn}
@@ -53,7 +58,18 @@ const InitialScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff'
+    backgroundColor: Colors.gray
+  },
+  logo: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16
+  },
+  logoText: {
+    color: Colors.white,
+    fontSize: 24,
+    paddingLeft: 15
   },
   imgContainer: {
     width,
@@ -63,35 +79,37 @@ const styles = StyleSheet.create({
   },
   images: {
     width: 150,
-    height: 150
+    height: 150,
+    borderRadius: 20
   },
   description: {
     width: 200,
     textAlign: 'center',
-    color: '#20302d',
+    color: Colors.white,
+    paddingTop: 40
   },
   btnLogarCtn: {
     justifyContent: 'center',
-    alignItems: 'center',
-    flex: 1
+    alignItems: 'center'
   },
   btnLogar: {
-    backgroundColor: '#96d5c9',
-    borderRadius: 5,
-    height: 30,
-    width: 180,
+    backgroundColor: Colors.lightGreen,
+    borderRadius: 20,
+    height: 27,
+    width: 150,
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#20302d',
+    color: Colors.gray,
     textAlign: 'center',
-    marginTop: 0
+    marginTop: 0,
+    marginBottom: 20
   },
   dots: {
-    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignSelf: 'center',
-    width: 50
+    width: 50,
+    marginBottom: 130
   }
 });
 
