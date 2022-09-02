@@ -1,70 +1,100 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { Feather } from '@expo/vector-icons';
-import { Colors } from '../../assets/scripts/colors.js';
-import SearchBar from '../components/SearchBar';
-import BtnFilter from '../components/BtnFilter';
-import tmdb from '../api/tmdb';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+} from "react-native";
+import { Feather } from "@expo/vector-icons";
+import { Colors } from "../../assets/scripts/colors.js";
+import SearchBar from "../components/SearchBar";
+import BtnFilter from "../components/BtnFilter";
+import tmdb from "../api/tmdb";
+import Slide from "../components/Slide.js";
 
 const HomeScreen = ({ navigation }) => {
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   const [results, setResults] = useState([]);
+  const [popular, setPopular] = useState([]);
 
   useEffect(() => {
     searchTmdbMovie("jones");
-  }, [])
+    searchPopular();
+  }, []);
 
   function getType(item) {
     if ("original_title" in item) {
-      return ('/movie/');
+      return "/movie/";
     } else if ("original_name" in item) {
-      return ('/tv/');
+      return "/tv/";
     } else if ("name" in item) {
-      return ('/person/');
+      return "/person/";
     }
   }
 
   async function searchTmdbMovie(query) {
     try {
-      const response = await tmdb.get('/search/movie', {
+      const response = await tmdb.get("/search/movie", {
         params: {
           query,
           include_adult: false,
-        }
-      })
+        },
+      });
       setResults(response.data.results);
-    }
-    catch (err) {
+    } catch (err) {
       console.log(err);
     }
   }
 
   async function searchTmdbTV(query) {
     try {
-      const response = await tmdb.get('/search/tv', {
+      const response = await tmdb.get("/search/tv", {
         params: {
           query,
           include_adult: false,
-        }
-      })
+        },
+      });
       setResults(response.data.results);
-    }
-    catch (err) {
+    } catch (err) {
       console.log(err);
+    }
+    async function searchTmdbMovie(query) {
+      try {
+        const response = await tmdb.get("/search/movie", {
+          params: {
+            query,
+            include_adult: false,
+          },
+        });
+        setResults(response.data.results);
+      } catch (err) {
+        console.log(err);
+      }
     }
   }
 
   async function searchTmdbPerson(query) {
     try {
-      const response = await tmdb.get('/search/person', {
+      const response = await tmdb.get("/search/person", {
         params: {
           query,
           include_adult: false,
-        }
-      })
+        },
+      });
       setResults(response.data.results);
+    } catch (err) {
+      console.log(err);
     }
-    catch (err) {
+  }
+
+  async function searchPopular() {
+    try {
+      const response = await tmdb.get("/search/movie/popular");
+      console.log(response);
+      setPopular(response.data.results);
+    } catch (err) {
       console.log(err);
     }
   }
@@ -72,7 +102,11 @@ const HomeScreen = ({ navigation }) => {
   return (
     <>
       <View style={styles.container}>
-        <SearchBar onChangeText={(t) => setText(t)} onEndEditing={(t) => searchTmdbMovie(t)} value={text} />
+        <SearchBar
+          onChangeText={(t) => setText(t)}
+          onEndEditing={(t) => searchTmdbMovie(t)}
+          value={text}
+        />
         <View style={styles.filter}>
           <TouchableOpacity onPress={() => searchTmdbMovie(text)}>
             <BtnFilter value="Movies" />
@@ -84,83 +118,102 @@ const HomeScreen = ({ navigation }) => {
             <BtnFilter value="People" />
           </TouchableOpacity>
         </View>
-        <FlatList data={results} keyExtractor={item => `${item.id.toString}`} renderItem={({ item }) => {
-          return (
-            <View style={styles.card}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("Details", {
-                  id: item.id,
-                  type: getType(item)
-                })}>
-                <Image style={styles.posterImg}
-                  source={{ uri: `https://image.tmdb.org/t/p/original${item.poster_path || item.profile_path}` }} />
-                <Text style={styles.description}>{item.original_title || item.original_name || item.name}</Text>
-              </TouchableOpacity>
-              <View style={styles.btns}>
-                <TouchableOpacity onPress={() => console.log("favoritou")}>
-                  <Feather name="star" size={22} color="#a4d7c8" />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => console.log("curtiu")}>
-                  <Feather name="thumbs-up" size={20} color="#a4d7c8" />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => console.log("não curtiu")}>
-                  <Feather name="thumbs-down" size={20} color="#a4d7c8" />
-                </TouchableOpacity>
+        <Slide list={popular} />
+        <FlatList
+          data={results}
+          keyExtractor={(item) => `${item.id.toString}`}
+          renderItem={({ item }) => {
+            return (
+              <View style={styles.card}>
                 <TouchableOpacity
-                  onPress={() => navigation.navigate("Details", {
-                    id: item.id,
-                    type: getType(item)
-                  })}>
-                  <Feather name="plus-circle" size={20} color="#a4d7c8" />
+                  onPress={() =>
+                    navigation.navigate("Details", {
+                      id: item.id,
+                      type: getType(item),
+                    })
+                  }
+                >
+                  <Image
+                    style={styles.posterImg}
+                    source={{
+                      uri: `https://image.tmdb.org/t/p/original${
+                        item.poster_path || item.profile_path
+                      }`,
+                    }}
+                  />
+                  <Text style={styles.description}>
+                    {item.original_title || item.original_name || item.name}
+                  </Text>
                 </TouchableOpacity>
+                <View style={styles.btns}>
+                  <TouchableOpacity onPress={() => console.log("favoritou")}>
+                    <Feather name="star" size={22} color="#a4d7c8" />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => console.log("curtiu")}>
+                    <Feather name="thumbs-up" size={20} color="#a4d7c8" />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => console.log("não curtiu")}>
+                    <Feather name="thumbs-down" size={20} color="#a4d7c8" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate("Details", {
+                        id: item.id,
+                        type: getType(item),
+                      })
+                    }
+                  >
+                    <Feather name="plus-circle" size={20} color="#a4d7c8" />
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-          )
-        }} />
+            );
+          }}
+        />
       </View>
     </>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.gray
+    backgroundColor: Colors.gray,
   },
   filter: {
-    flexDirection: 'row',
-    alignSelf: 'center',
-    alignContent: 'space-between'
+    flexDirection: "row",
+    alignSelf: "center",
+    alignContent: "space-between",
   },
   card: {
-    alignSelf: 'center',
-    alignContent: 'space-between',
+    alignSelf: "center",
+    alignContent: "space-between",
     margin: 30,
     width: 350,
     height: 200,
     padding: 10,
-    textAlign: 'center',
+    textAlign: "center",
     borderRadius: 20,
     boxShadow: "0 0 1em black",
-    backgroundColor: Colors.lightGray
+    backgroundColor: Colors.lightGray,
   },
   posterImg: {
     height: 100,
     width: 100,
     borderRadius: 50,
-    alignSelf: 'center',
-    alignContent: 'space-between'
+    alignSelf: "center",
+    alignContent: "space-between",
   },
   description: {
     color: Colors.white,
   },
   btns: {
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     paddingTop: 20,
     paddingBottom: 0,
     marginBottom: 0,
-  }
+  },
 });
 
 export default HomeScreen;
