@@ -12,17 +12,18 @@ import tmdb from "../api/tmdb";
 import MovieDetails from "../components/MovieDetails";
 
 const Secao = (props) => {
-  const [results, setResults] = useState([]);
+  const [movie, setMovie] = useState([]);
+
   async function searchTmdbMovie(id) {
     console.log(id);
     try {
       const response = await tmdb.get(`/movie/${id}`);
-      console.log(response);
       return <MovieDetails type={response.data} />;
     } catch (err) {
       console.log(err);
     }
   }
+  console.log(movie);
   return (
     <View style={styles.container}>
       <View style={styles.borderTop} />
@@ -34,7 +35,9 @@ const Secao = (props) => {
         renderItem={({ item, index }) => (
           <TouchableOpacity
             key={index}
-            onPress={() => searchTmdbMovie(item.id)}
+            onPress={() => {
+              searchTmdbMovie(item.id);
+            }}
           >
             <ImageBackground
               style={[

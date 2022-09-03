@@ -19,6 +19,8 @@ const HomeScreen = ({ navigation }) => {
   const [results, setResults] = useState([]);
   const [popular, setPopular] = useState([]);
 
+  console.log("popular", popular);
+
   useEffect(() => {
     searchTmdbMovie("jones");
     searchPopular();
@@ -34,6 +36,7 @@ const HomeScreen = ({ navigation }) => {
     }
   }
 
+  console.log(popular, results);
   async function searchTmdbMovie(query) {
     try {
       const response = await tmdb.get("/search/movie", {
@@ -60,19 +63,6 @@ const HomeScreen = ({ navigation }) => {
     } catch (err) {
       console.log(err);
     }
-    async function searchTmdbMovie(query) {
-      try {
-        const response = await tmdb.get("/search/movie", {
-          params: {
-            query,
-            include_adult: false,
-          },
-        });
-        setResults(response.data.results);
-      } catch (err) {
-        console.log(err);
-      }
-    }
   }
 
   async function searchTmdbPerson(query) {
@@ -91,7 +81,7 @@ const HomeScreen = ({ navigation }) => {
 
   async function searchPopular() {
     try {
-      const response = await tmdb.get("/search/movie/popular");
+      const response = await tmdb.get("/movie/popular");
       console.log(response);
       setPopular(response.data.results);
     } catch (err) {
@@ -99,6 +89,7 @@ const HomeScreen = ({ navigation }) => {
     }
   }
 
+  console.log(popular);
   return (
     <>
       <View style={styles.container}>
@@ -118,7 +109,10 @@ const HomeScreen = ({ navigation }) => {
             <BtnFilter value="People" />
           </TouchableOpacity>
         </View>
-        <Slide list={popular} />
+        <View>
+          <Slide list={popular} />
+        </View>
+
         <FlatList
           data={results}
           keyExtractor={(item) => `${item.id.toString}`}

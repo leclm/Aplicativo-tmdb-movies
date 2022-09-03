@@ -45,13 +45,17 @@ const styles = {
   },
 };
 
-const Slide = ({ value }) => {
+const Slide = (props) => {
+  console.log("entrou");
   const imagesSlider = [1, 3, 4, 5];
   return (
     <View style={styles.container}>
       <Swiper autoplay height={200}>
-        {imagesSlider.map((item, i) => (
-          <Slider uri={"https://i.imgur.com/EJyDFeY.jpg"} key={i} />
+        {props.list.map((item, i) => (
+          <Slider
+            uri={`https://image.tmdb.org/t/p/original${item.poster_path}`}
+            key={i}
+          />
         ))}
       </Swiper>
     </View>
