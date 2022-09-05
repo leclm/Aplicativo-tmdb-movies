@@ -61,7 +61,7 @@ const InitialScreen = ({ navigation }) => {
         </View>
         <TouchableOpacity
           style={styles.btnLogarCtn}
-          onPress={() => navigation.navigate("Home")}
+          onPress={() => navigation.navigate("Login")}
         >
           <Text style={styles.btnLogar}>Logar</Text>
         </TouchableOpacity>
