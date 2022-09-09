@@ -28,7 +28,7 @@ const HomeScreen = ({ navigation }) => {
   console.log("popular", popular);
 
   useEffect(() => {
-    searchTmdbMovie("jones");
+    searchTmdbMovie("tecnologia");
     searchPopular();
   }, []);
 
@@ -184,17 +184,7 @@ const HomeScreen = ({ navigation }) => {
           onEndEditing={(t) => searchTmdbMovie(t)}
           value={text}
         />
-        <View style={styles.filter}>
-          <TouchableOpacity onPress={() => searchTmdbMovie(text)}>
-            <BtnFilter value="Movies" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => searchTmdbTV(text)}>
-            <BtnFilter value="TV" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => searchTmdbPerson(text)}>
-            <BtnFilter value="People" />
-          </TouchableOpacity>
-        </View>
+
         <View>
           <Slide list={popular} />
         </View>
@@ -270,6 +260,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     alignContent: "space-between",
     margin: 30,
+    marginBottom:5,
     width: 350,
     height: 200,
     padding: 10,

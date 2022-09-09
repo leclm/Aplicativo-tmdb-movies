@@ -354,6 +354,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     alignContent: "space-between",
     margin: 30,
+    marginBottom:5,
     width: 350,
     height: 200,
     padding: 10,
