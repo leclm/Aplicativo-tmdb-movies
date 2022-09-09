@@ -41,7 +41,7 @@ export default function LoginScreen(){
         <View style={styles.header2}>
             <Text style={styles.description2}>Faça Login em sua conta</Text>
         </View>
-
+        {/*
         <View style={styles.entraFG}>
             <View style={styles.tipodeentrada}>
             <TouchableOpacity onPress={() => navigation.navigate("Initial")}>
@@ -60,10 +60,9 @@ export default function LoginScreen(){
             </View>
         </View>
         
-        
+        */}
 
         <View style={styles.loginEntrada}>
-            <Text style={styles.description2}>OU</Text>
             <View style={styles.containerbtn}>
             <Feather name="user" size={18} color="#a4d7c8" />
                 <TextInput
@@ -147,6 +146,7 @@ const styles = StyleSheet.create({
   loginEntrada: {
     flex: 1,
     justifyContent: 'center',
+    marginTop:40,
   },
   textInput: {
     fontSize: 18,
