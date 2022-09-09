@@ -16,10 +16,8 @@ import Slide from "../components/Slide.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SaveScreen = ({ navigation }) => {
-  const [text, setText] = useState("");
   const [saved, setSaved] = useState([]);
   const [update, setUpdate] = useState([]);
-  const [liked, setLiked] = useState([]);
   let emailUser = "username@email.com";
   let categoryType = "movie";
   let starList;
@@ -30,10 +28,7 @@ const SaveScreen = ({ navigation }) => {
   useEffect(() => {
     getItemsSave(emailUser, update, categoryType);
   }, [update]);
-  useEffect(() => {
-    getItemsSave(emailUser, update, categoryType);
-  }, [liked]);
-
+ 
   async function save(typeId, section) {
     try {
       //Data
