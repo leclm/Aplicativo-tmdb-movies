@@ -18,6 +18,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const SaveScreen = ({ navigation }) => {
   const [text, setText] = useState("");
   const [saved, setSaved] = useState([]);
+  const [update, setUpdate] = useState([]);
   let emailUser = "username@email.com";
   let categoryType = "movie";
   const count = "star";
@@ -26,6 +27,10 @@ const SaveScreen = ({ navigation }) => {
   useEffect(() => {
     getItemsSave(emailUser,count,categoryType);
   }, []);
+
+  useEffect(() => {
+    getItemsSave(emailUser,count,categoryType);
+  }, [update]);
 
 
   async function save(typeId, section) {
@@ -90,6 +95,8 @@ const SaveScreen = ({ navigation }) => {
 
       //Remove all Items from AsyncStorage from a keyUser
       //await AsyncStorage.removeItem(keyUser)
+      setUpdate(starListNew);
+    
 
     } catch (e) {
       console.log("Ocorreu um erro: " + e);
