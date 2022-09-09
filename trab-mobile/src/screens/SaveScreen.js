@@ -10,27 +10,27 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Colors } from "../../assets/scripts/colors.js";
-import SearchBar from "../components/SearchBar";
 import BtnFilter from "../components/BtnFilter";
 import tmdb from "../api/tmdb";
 import Slide from "../components/Slide.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAlerts } from "react-native-paper-alerts";
 
-const HomeScreen = ({ navigation }) => {
-  const [text, setText] = useState("");
-  const [results, setResults] = useState([]);
-  const [popular, setPopular] = useState([]);
+const SaveScreen = ({ navigation }) => {
+  const [saved, setSaved] = useState([]);
+  const [update, setUpdate] = useState([]);
+  let emailUser = "username@email.com";
+  let categoryType = "movie";
+  let starList;
 
   const alerts = useAlerts();
-  let emailUser = "username@email.com";
-
-  console.log("popular", popular);
 
   useEffect(() => {
-    searchTmdbMovie("tecnologia");
-    searchPopular();
+    getItemsSave(emailUser, "star", categoryType);
   }, []);
+  useEffect(() => {
+    getItemsSave(emailUser, update, categoryType);
+  }, [update]);
 
   async function setItemSave(typeId, section) {
     try {
@@ -107,8 +107,45 @@ const HomeScreen = ({ navigation }) => {
 
       //Remove all Items from AsyncStorage from a keyUser
       //await AsyncStorage.removeItem(keyUser)
+
+      getItemsSave(emailUser, section, categoryType);
     } catch (e) {
       console.log("Ocorreu um erro: " + e);
+    }
+  }
+
+  async function getItemsSave(email, section, category) {
+    try {
+      //Data
+      //console.log("parametro="+params)
+      let user = email;
+      let dataType = section;
+      let keyValue = user + ":" + dataType;
+      let mediaType = category;
+
+      //GetItem - object
+      try {
+        let starGet = await AsyncStorage.getItem(keyValue);
+        starList = JSON.parse(starGet);
+      } catch (err) {
+        console.log("EERRROOOO.....", err);
+      }
+
+      let listTmdb = starList.map(async function (queryc) {
+        try {
+          const response = await tmdb.get(`/${mediaType}/${queryc.id}`);
+          return response.data;
+        } catch (err) {
+          console.log("erro response...", err);
+        }
+      });
+      let listOjects = await Promise.all(listTmdb);
+      setSaved(listOjects);
+      setUpdate(section);
+    } catch (e) {
+      console.log("Ocorreu um erro: " + e);
+      let listObjectsEmpty = null;
+      setSaved(listObjectsEmpty);
     }
   }
 
@@ -122,75 +159,113 @@ const HomeScreen = ({ navigation }) => {
     }
   }
 
-  console.log(popular, results);
-  async function searchTmdbMovie(query) {
-    try {
-      const response = await tmdb.get("/search/movie", {
-        params: {
-          query,
-          include_adult: false,
-        },
-      });
-      setResults(response.data.results);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  async function searchTmdbTV(query) {
-    try {
-      const response = await tmdb.get("/search/tv", {
-        params: {
-          query,
-          include_adult: false,
-        },
-      });
-      setResults(response.data.results);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  async function searchTmdbPerson(query) {
-    try {
-      const response = await tmdb.get("/search/person", {
-        params: {
-          query,
-          include_adult: false,
-        },
-      });
-      setResults(response.data.results);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  async function searchPopular() {
-    try {
-      const response = await tmdb.get("/movie/popular");
-      console.log(response);
-      setPopular(response.data.results);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  console.log(popular);
   return (
     <>
       <View style={styles.container}>
-        <SearchBar
-          onChangeText={(t) => setText(t)}
-          onEndEditing={(t) => searchTmdbMovie(t)}
-          value={text}
-        />
+        <View style={styles.filter}>
+          <TouchableOpacity
+            onPress={() => getItemsSave(emailUser, "star", categoryType)}
+          >
+            <View
+              style={[
+                styles.txtBtn,
+                update == "star" ? styles.txtBtnSelect : styles.txtBtnNormal,
+              ]}
+            >
+              <Feather
+                name="star"
+                size={27}
+                color={[update == "star" ? "#ffffff" : "#a4d7c8"]}
+              />
+              <Text
+                style={[
+                  styles.txt,
+                  update == "star" ? styles.txtBtnSelect : styles.txtBtnNormal,
+                ]}
+              >
+                Favoritos
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => getItemsSave(emailUser, "like", categoryType)}
+          >
+            <View
+              style={[
+                styles.txtBtn,
+                update == "like" ? styles.txtBtnSelect : styles.txtBtnNormal,
+              ]}
+            >
+              <Feather
+                name="thumbs-up"
+                size={27}
+                color={[update == "like" ? "#ffffff" : "#a4d7c8"]}
+              />
+              <Text
+                style={[
+                  styles.txt,
+                  update == "like" ? styles.txtBtnSelect : styles.txtBtnNormal,
+                ]}
+              >
+                Curti
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => getItemsSave(emailUser, "dislike", categoryType)}
+          >
+            <View
+              style={[
+                styles.txtBtn,
+                update == "dislike" ? styles.txtBtnSelect : styles.txtBtnNormal,
+              ]}
+            >
+              <Feather
+                name="thumbs-down"
+                size={27}
+                color={[update == "dislike" ? "#ffffff" : "#a4d7c8"]}
+              />
+              <Text
+                style={[
+                  styles.txt,
+                  update == "dislike"
+                    ? styles.txtBtnSelect
+                    : styles.txtBtnNormal,
+                ]}
+              >
+                Não curti
+              </Text>
+            </View>
+          </TouchableOpacity>
 
-        <View>
-          <Slide list={popular} />
+          <TouchableOpacity
+            onPress={() => getItemsSave(emailUser, "watch", categoryType)}
+          >
+            <View
+              style={[
+                styles.txtBtn,
+                update == "watch" ? styles.txtBtnSelect : styles.txtBtnNormal,
+              ]}
+            >
+              <Feather
+                name="plus-circle"
+                size={27}
+                color={[update == "watch" ? "#ffffff" : "#a4d7c8"]}
+              />
+              <Text
+                style={[
+                  styles.txt,
+                  update == "watch" ? styles.txtBtnSelect : styles.txtBtnNormal,
+                ]}
+              >
+                Ver depois
+              </Text>
+            </View>
+          </TouchableOpacity>
         </View>
 
         <FlatList
-          data={results}
+          data={saved}
           keyExtractor={(item) => `${item.id.toString}`}
           renderItem={({ item }) => {
             return (
@@ -222,6 +297,7 @@ const HomeScreen = ({ navigation }) => {
                     <Feather name="star" size={27} color="#a4d7c8" />
                   </TouchableOpacity>
                   <TouchableOpacity
+                    style={styles.btnLike}
                     onPress={() => setItemSave(item.id, "like")}
                   >
                     <Feather name="thumbs-up" size={27} color="#a4d7c8" />
@@ -256,6 +332,24 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     alignContent: "space-between",
   },
+  txt: {
+    fontSize: 12,
+    paddingTop: 5,
+    paddingBottom: 5,
+    textAlign: "center",
+  },
+  txtBtn: {
+    borderRadius: 22,
+
+    borderWidth: 1,
+    width: 75,
+    margin: 6,
+    padding: 8,
+    paddingTop: 4,
+    textAlign: "center",
+  },
+  txtBtnSelect: { color: "#ffffff", borderColor: "#ffffff" },
+  txtBtnNormal: { color: "#6bada0", borderColor: "#6bada0" },
   card: {
     alignSelf: "center",
     alignContent: "space-between",
@@ -289,4 +383,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default SaveScreen;
