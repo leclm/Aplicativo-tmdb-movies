@@ -19,25 +19,25 @@ const SaveScreen = ({ navigation }) => {
   const [text, setText] = useState("");
   const [saved, setSaved] = useState([]);
   const [update, setUpdate] = useState([]);
+  const [liked, setLiked] = useState([]);
   let emailUser = "username@email.com";
   let categoryType = "movie";
-  const count = "star";
   let starList;
 
   useEffect(() => {
-    getItemsSave(emailUser,count,categoryType);
+    getItemsSave(emailUser, "star", categoryType);
   }, []);
-
   useEffect(() => {
-    getItemsSave(emailUser,count,categoryType);
+    getItemsSave(emailUser, update, categoryType);
   }, [update]);
-
+  useEffect(() => {
+    getItemsSave(emailUser, update, categoryType);
+  }, [liked]);
 
   async function save(typeId, section) {
     try {
-
       //Data
-      let user = "username@email.com";
+      let user = emailUser;
       let itemId = typeId;
       let itemToAdd = { id: itemId };
       let itemToRemove = parseInt(itemId);
@@ -47,10 +47,18 @@ const SaveScreen = ({ navigation }) => {
       let result;
       let title;
 
-      if(section=='star'){title='favoritos'}
-      if(section=='watch'){title='assistir mais tarde'}
-      if(section=='like'){title='curtidos'}
-      if(section=='dislike'){title='não curtidos'}
+      if (section == "star") {
+        title = "favoritos";
+      }
+      if (section == "watch") {
+        title = "assistir mais tarde";
+      }
+      if (section == "like") {
+        title = "curtidos";
+      }
+      if (section == "dislike") {
+        title = "não curtidos";
+      }
 
       //GetItem from AsyncStorage to get favorite movies
       let starGet = await AsyncStorage.getItem(keyUser);
@@ -68,20 +76,23 @@ const SaveScreen = ({ navigation }) => {
       //Add movie to AsyncStorage if it can't find the selected movie id among the favorite ones
       if (result === -1) {
         starListObj.splice(0, 0, itemToAdd);
-        console.log("Novo item adicionado ao AsyncStorage: ",itemToAdd);
-        Alert.alert("Adicionado em "+title+"!");
+        console.log("Novo item adicionado ao AsyncStorage: ", itemToAdd);
+        Alert.alert("Adicionado em " + title + "!");
       }
       //Add movie to AsyncStorage if there are no favorite movies list
       if (result === -2) {
         starListObj = [itemToAdd];
-        console.log("Primeiro item adicionado ao AsyncStorage: ",itemToAdd);
-        Alert.alert("Adicionado em "+title+"!");
+        console.log("Primeiro item adicionado ao AsyncStorage: ", itemToAdd);
+        Alert.alert("Adicionado em " + title + "!");
       }
       //Remove movie from AsyncStorage if can find the selected movie id among the favorite ones
-      if(result >= 0) {
-        const itemRemoved = starListObj.splice(starListObj.findIndex((x) => x.id === itemToRemove),1);
-        console.log("Item removido do AsyncStorage: ",itemRemoved);
-        Alert.alert("Removido de "+title+"!");
+      if (result >= 0) {
+        const itemRemoved = starListObj.splice(
+          starListObj.findIndex((x) => x.id === itemToRemove),
+          1
+        );
+        console.log("Item removido do AsyncStorage: ", itemRemoved);
+        Alert.alert("Removido de " + title + "!");
       }
 
       //SetItem to update AsyncStorage with new movies
@@ -91,19 +102,18 @@ const SaveScreen = ({ navigation }) => {
       //GetItem to get the movie list from AsyncStorage
       let starGetNew = await AsyncStorage.getItem(keyUser);
       let starListNew = JSON.parse(starGetNew);
-      console.log("Lista nova do "+keyUser,starListNew);
+      console.log("Lista nova do " + keyUser, starListNew);
 
       //Remove all Items from AsyncStorage from a keyUser
       //await AsyncStorage.removeItem(keyUser)
-      setUpdate(starListNew);
-    
 
+      getItemsSave(emailUser, section, categoryType)
     } catch (e) {
       console.log("Ocorreu um erro: " + e);
     }
   }
 
-  async function getItemsSave(email, section, category){
+  async function getItemsSave(email, section, category) {
     try {
       //Data
       //console.log("parametro="+params)
@@ -113,30 +123,30 @@ const SaveScreen = ({ navigation }) => {
       let mediaType = category;
 
       //GetItem - object
-      try{
+      try {
         let starGet = await AsyncStorage.getItem(keyValue);
-      starList = JSON.parse(starGet);
-      
-      }catch(err){console.log("EERRROOOO.....",err)}
-      
-      let listTmdb = starList.map(async function (queryc){
+        starList = JSON.parse(starGet);
+      } catch (err) {
+        console.log("EERRROOOO.....", err);
+      }
+
+      let listTmdb = starList.map(async function (queryc) {
         try {
           const response = await tmdb.get(`/${mediaType}/${queryc.id}`);
           return response.data;
         } catch (err) {
-          console.log("erro response...",err);
+          console.log("erro response...", err);
         }
-
-      })
+      });
       let listOjects = await Promise.all(listTmdb);
-      setSaved(listOjects)
-
+      setSaved(listOjects);
+      setUpdate(section);
     } catch (e) {
       console.log("Ocorreu um erro: " + e);
       let listObjectsEmpty = null;
-      setSaved(listObjectsEmpty)
+      setSaved(listObjectsEmpty);
     }
-  };
+  }
 
   function getType(item) {
     if ("original_title" in item) {
@@ -152,18 +162,54 @@ const SaveScreen = ({ navigation }) => {
     <>
       <View style={styles.container}>
         <View style={styles.filter}>
-          <TouchableOpacity style={styles.btnFav} onPress={() => getItemsSave(emailUser,"star",categoryType)}>
-            <BtnFilter value="Favoritos" />
+          <TouchableOpacity
+            onPress={() => getItemsSave(emailUser, "star", categoryType)}
+          >
+            <Text
+              style={[
+                styles.txtBtn,
+                update == "star" ? styles.txtBtnSelect : styles.txtBtnNormal,
+              ]}
+            >
+              Favoritos
+            </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btnFav} onPress={() => getItemsSave(emailUser,"watch",categoryType)}>
-            <BtnFilter value="Pretendo ver" />
+          <TouchableOpacity
+            onPress={() => getItemsSave(emailUser, "watch", categoryType)}
+          >
+            <Text
+              style={[
+                styles.txtBtn,
+                update == "watch" ? styles.txtBtnSelect : styles.txtBtnNormal,
+              ]}
+            >
+              Pretendo ver
+            </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.btnFav} onPress={() => getItemsSave(emailUser,"dislike",categoryType)}>
-            <BtnFilter value="Não curtidos" />
+          <TouchableOpacity
+            onPress={() => getItemsSave(emailUser, "dislike", categoryType)}
+          >
+            <Text
+              style={[
+                styles.txtBtn,
+                update == "dislike" ? styles.txtBtnSelect : styles.txtBtnNormal,
+              ]}
+            >
+              Não curtidos
+            </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btnFav} onPress={() => getItemsSave(emailUser,"like",categoryType)}>
-            <BtnFilter value="Curtidos" />
+          <TouchableOpacity
+            onPress={() => getItemsSave(emailUser, "like", categoryType)}
+          >
+            <Text
+              style={[
+                styles.txtBtn,
+                update == "like" ? styles.txtBtnSelect : styles.txtBtnNormal,
+              ]}
+            >
+              Curtidos
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -194,18 +240,21 @@ const SaveScreen = ({ navigation }) => {
                   </Text>
                 </TouchableOpacity>
                 <View style={styles.btns}>
-                <TouchableOpacity onPress={() => save(item.id, "star")}>
-              <Feather name="star" size={27} color="#a4d7c8" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => save(item.id, "like")}>
-              <Feather name="thumbs-up" size={27} color="#a4d7c8" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => save(item.id, "dislike")}>
-              <Feather name="thumbs-down" size={27} color="#a4d7c8" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => save(item.id, "watch")}>
-              <Feather name="plus-circle" size={27} color="#a4d7c8" />
-            </TouchableOpacity>
+                  <TouchableOpacity onPress={() => save(item.id, "star")}>
+                    <Feather name="star" size={27} color="#a4d7c8" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.btnLike}
+                    onPress={() => save(item.id, "like")}
+                  >
+                    <Feather name="thumbs-up" size={27} color="#a4d7c8" />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => save(item.id, "dislike")}>
+                    <Feather name="thumbs-down" size={27} color="#a4d7c8" />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => save(item.id, "watch")}>
+                    <Feather name="plus-circle" size={27} color="#a4d7c8" />
+                  </TouchableOpacity>
                 </View>
               </View>
             );
@@ -225,10 +274,17 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     alignContent: "space-between",
   },
-  btnFav:{
-    padding:0,
-    margin:0,
+  txtBtn: {
+    borderRadius: 100,
+
+    borderWidth: 1,
+    width: 73,
+    margin: 10,
+    padding: 7,
+    textAlign: "center",
   },
+  txtBtnSelect: { color: "#ffffff", borderColor: "#ffffff" },
+  txtBtnNormal: { color: "#6bada0", borderColor: "#6bada0" },
   card: {
     alignSelf: "center",
     alignContent: "space-between",
