@@ -14,6 +14,7 @@ import BtnFilter from "../components/BtnFilter";
 import tmdb from "../api/tmdb";
 import Slide from "../components/Slide.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAlerts } from "react-native-paper-alerts";
 
 const SaveScreen = ({ navigation }) => {
   const [saved, setSaved] = useState([]);
@@ -22,14 +23,16 @@ const SaveScreen = ({ navigation }) => {
   let categoryType = "movie";
   let starList;
 
+  const alerts = useAlerts();
+
   useEffect(() => {
     getItemsSave(emailUser, "star", categoryType);
   }, []);
   useEffect(() => {
     getItemsSave(emailUser, update, categoryType);
   }, [update]);
- 
-  async function save(typeId, section) {
+
+  async function setItemSave(typeId, section) {
     try {
       //Data
       let user = emailUser;
@@ -72,13 +75,15 @@ const SaveScreen = ({ navigation }) => {
       if (result === -1) {
         starListObj.splice(0, 0, itemToAdd);
         console.log("Novo item adicionado ao AsyncStorage: ", itemToAdd);
-        Alert.alert("Adicionado em " + title + "!");
+        alerts.alert("Adicionado em " + title + "!");
+        //Alert.alert("Adicionado em " + title + "!");
       }
       //Add movie to AsyncStorage if there are no favorite movies list
       if (result === -2) {
         starListObj = [itemToAdd];
         console.log("Primeiro item adicionado ao AsyncStorage: ", itemToAdd);
-        Alert.alert("Adicionado em " + title + "!");
+        alerts.alert("Adicionado em " + title + "!");
+        //Alert.alert("Adicionado em " + title + "!");
       }
       //Remove movie from AsyncStorage if can find the selected movie id among the favorite ones
       if (result >= 0) {
@@ -87,7 +92,8 @@ const SaveScreen = ({ navigation }) => {
           1
         );
         console.log("Item removido do AsyncStorage: ", itemRemoved);
-        Alert.alert("Removido de " + title + "!");
+        alerts.alert("Removido de " + title + "!");
+        //Alert.alert("Removido de " + title + "!");
       }
 
       //SetItem to update AsyncStorage with new movies
@@ -102,7 +108,7 @@ const SaveScreen = ({ navigation }) => {
       //Remove all Items from AsyncStorage from a keyUser
       //await AsyncStorage.removeItem(keyUser)
 
-      getItemsSave(emailUser, section, categoryType)
+      getItemsSave(emailUser, section, categoryType);
     } catch (e) {
       console.log("Ocorreu um erro: " + e);
     }
@@ -160,51 +166,101 @@ const SaveScreen = ({ navigation }) => {
           <TouchableOpacity
             onPress={() => getItemsSave(emailUser, "star", categoryType)}
           >
-            <Text
+            <View
               style={[
                 styles.txtBtn,
                 update == "star" ? styles.txtBtnSelect : styles.txtBtnNormal,
               ]}
             >
-              Favoritos
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => getItemsSave(emailUser, "watch", categoryType)}
-          >
-            <Text
-              style={[
-                styles.txtBtn,
-                update == "watch" ? styles.txtBtnSelect : styles.txtBtnNormal,
-              ]}
-            >
-              Pretendo ver
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => getItemsSave(emailUser, "dislike", categoryType)}
-          >
-            <Text
-              style={[
-                styles.txtBtn,
-                update == "dislike" ? styles.txtBtnSelect : styles.txtBtnNormal,
-              ]}
-            >
-              Não curtidos
-            </Text>
+              <Feather
+                name="star"
+                size={27}
+                color={[update == "star" ? "#ffffff" : "#a4d7c8"]}
+              />
+              <Text
+                style={[
+                  styles.txt,
+                  update == "star" ? styles.txtBtnSelect : styles.txtBtnNormal,
+                ]}
+              >
+                Favoritos
+              </Text>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => getItemsSave(emailUser, "like", categoryType)}
           >
-            <Text
+            <View
               style={[
                 styles.txtBtn,
                 update == "like" ? styles.txtBtnSelect : styles.txtBtnNormal,
               ]}
             >
-              Curtidos
-            </Text>
+              <Feather
+                name="thumbs-up"
+                size={27}
+                color={[update == "like" ? "#ffffff" : "#a4d7c8"]}
+              />
+              <Text
+                style={[
+                  styles.txt,
+                  update == "like" ? styles.txtBtnSelect : styles.txtBtnNormal,
+                ]}
+              >
+                Curti
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => getItemsSave(emailUser, "dislike", categoryType)}
+          >
+            <View
+              style={[
+                styles.txtBtn,
+                update == "dislike" ? styles.txtBtnSelect : styles.txtBtnNormal,
+              ]}
+            >
+              <Feather
+                name="thumbs-down"
+                size={27}
+                color={[update == "dislike" ? "#ffffff" : "#a4d7c8"]}
+              />
+              <Text
+                style={[
+                  styles.txt,
+                  update == "dislike"
+                    ? styles.txtBtnSelect
+                    : styles.txtBtnNormal,
+                ]}
+              >
+                Não curti
+              </Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => getItemsSave(emailUser, "watch", categoryType)}
+          >
+            <View
+              style={[
+                styles.txtBtn,
+                update == "watch" ? styles.txtBtnSelect : styles.txtBtnNormal,
+              ]}
+            >
+              <Feather
+                name="plus-circle"
+                size={27}
+                color={[update == "watch" ? "#ffffff" : "#a4d7c8"]}
+              />
+              <Text
+                style={[
+                  styles.txt,
+                  update == "watch" ? styles.txtBtnSelect : styles.txtBtnNormal,
+                ]}
+              >
+                Ver depois
+              </Text>
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -235,19 +291,25 @@ const SaveScreen = ({ navigation }) => {
                   </Text>
                 </TouchableOpacity>
                 <View style={styles.btns}>
-                  <TouchableOpacity onPress={() => save(item.id, "star")}>
+                  <TouchableOpacity
+                    onPress={() => setItemSave(item.id, "star")}
+                  >
                     <Feather name="star" size={27} color="#a4d7c8" />
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.btnLike}
-                    onPress={() => save(item.id, "like")}
+                    onPress={() => setItemSave(item.id, "like")}
                   >
                     <Feather name="thumbs-up" size={27} color="#a4d7c8" />
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => save(item.id, "dislike")}>
+                  <TouchableOpacity
+                    onPress={() => setItemSave(item.id, "dislike")}
+                  >
                     <Feather name="thumbs-down" size={27} color="#a4d7c8" />
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => save(item.id, "watch")}>
+                  <TouchableOpacity
+                    onPress={() => setItemSave(item.id, "watch")}
+                  >
                     <Feather name="plus-circle" size={27} color="#a4d7c8" />
                   </TouchableOpacity>
                 </View>
@@ -262,6 +324,7 @@ const SaveScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     backgroundColor: Colors.gray,
   },
   filter: {
@@ -269,13 +332,20 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     alignContent: "space-between",
   },
+  txt: {
+    fontSize: 12,
+    paddingTop: 5,
+    paddingBottom: 5,
+    textAlign: "center",
+  },
   txtBtn: {
-    borderRadius: 100,
+    borderRadius: 22,
 
     borderWidth: 1,
-    width: 73,
-    margin: 10,
-    padding: 7,
+    width: 75,
+    margin: 6,
+    padding: 8,
+    paddingTop: 4,
     textAlign: "center",
   },
   txtBtnSelect: { color: "#ffffff", borderColor: "#ffffff" },
