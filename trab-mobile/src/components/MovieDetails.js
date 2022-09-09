@@ -12,6 +12,7 @@ import {
 import { Feather } from "@expo/vector-icons";
 import BtnFilter from "./BtnFilter";
 import tmdb from "../api/tmdb";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { Title, Button, Paragraph, Caption } from "react-native-paper";
 import Secao from "./Secao";
@@ -26,6 +27,100 @@ const MovieDetails = ({ type }) => {
     getCredits();
     getSimiliar();
   }, [type.id]);
+
+  async function save(typeId, section) {
+    try {
+      let itemId = typeId;
+
+      //Data
+
+      let itemToAdd = { id: itemId };
+      let itemToRemove = parseInt(itemId);
+      let user = "username@email.com";
+      let dataType = section;
+      let keyUser = user + ":" + dataType;
+
+      //GetItem - object
+      let starGet = await AsyncStorage.getItem(keyUser);
+      let starListObj = [{}];
+      let result;
+
+      //SetItem First time??? - string
+      if (starGet === null) {
+        console.log("Null.. -2");
+
+        result = -2;
+        //let starOriginal = [];
+        //let starSet = JSON.stringify(starOriginal)
+        //await AsyncStorage.setItem(keyUser, starSet);
+        //starGet = await AsyncStorage.getItem(keyUser);
+      } else {
+        console.log("não eh null");
+
+        starListObj = JSON.parse(starGet);
+
+        console.log("starListOj eh...", starListObj)
+        console.log("sitemId eh...", itemId)
+
+        try {
+          //starListObj = [{id:1},{id:2}]
+          //console.log("result antes...", result)
+          result = starListObj.findIndex((x) => x.id === itemId);
+          console.log("result dps...", result)
+        } catch (err) {
+          console.log("Erro... ", err);
+        }
+
+        //console.log("resultado......")
+        console.log("Encontrou no AsyncStorage? ", result);
+        //console.log("Lista antiga: ")
+        //console.log(starListObj)
+      }
+
+      console.log("itemToAdd..." , itemToAdd)
+
+      if (result === -1) {
+        //Add item - object
+        starListObj.splice(0, 0, itemToAdd);
+        console.log("-1, n null mas vazio. Logo splice")
+      }
+      if (result === -2) {
+        starListObj = [itemToAdd];
+        console.log("-2, null, logo setar primeira vez")
+      }
+      if(result >= 0) {
+        //Remove item by id - object
+        const itemRemoved = starListObj.splice(
+          starListObj.findIndex((x) => x.id === itemToRemove),
+          1
+        );
+        console.log("else, já existe. Remover...")
+
+        console.log("Item removido: ");
+        console.log(itemRemoved);
+      }
+
+      console.log("Lista final para ir ao async: ");
+      console.log(starListObj);
+
+      //SetItem New - string
+      let starSetNew = JSON.stringify(starListObj);
+      await AsyncStorage.setItem(keyUser, starSetNew);
+
+      //GetItem - object
+      let starGetNew = await AsyncStorage.getItem(keyUser);
+      let starListNew = JSON.parse(starGetNew);
+
+      console.log("Lista nova: ");
+      console.log(starListNew);
+
+      //Remove Item storage
+     // await AsyncStorage.removeItem(keyUser)
+
+    } catch (e) {
+      console.log("Ocorreu um erro: " + e);
+    }
+  }
 
   const content = async () => {
     try {
@@ -109,23 +204,16 @@ const MovieDetails = ({ type }) => {
           </Caption>
 
           <View style={styles.btns}>
-            <TouchableOpacity onPress={() => console.log("favoritou")}>
+            <TouchableOpacity onPress={() => save(type.id, "star")}>
               <Feather name="star" size={27} color="#a4d7c8" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => console.log("curtiu")}>
+            <TouchableOpacity onPress={() => save(type.id, "like")}>
               <Feather name="thumbs-up" size={27} color="#a4d7c8" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => console.log("não curtiu")}>
+            <TouchableOpacity onPress={() => save(type.id, "dislike")}>
               <Feather name="thumbs-down" size={27} color="#a4d7c8" />
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate("Details", {
-                  id: item.id,
-                  type: getType(item),
-                })
-              }
-            >
+            <TouchableOpacity onPress={() => save(type.id, "watch")}>
               <Feather name="plus-circle" size={27} color="#a4d7c8" />
             </TouchableOpacity>
           </View>

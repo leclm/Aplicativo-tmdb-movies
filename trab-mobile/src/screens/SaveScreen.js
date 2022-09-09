@@ -9,22 +9,64 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Colors } from "../../assets/scripts/colors.js";
-import SearchBar from "../components/SearchBar";
 import BtnFilter from "../components/BtnFilter";
 import tmdb from "../api/tmdb";
 import Slide from "../components/Slide.js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const HomeScreen = ({ navigation }) => {
+const SaveScreen = ({ navigation }) => {
   const [text, setText] = useState("");
-  const [results, setResults] = useState([]);
-  const [popular, setPopular] = useState([]);
+  const [saved, setSaved] = useState([]);
+  let emailUser = "username@email.com";
+  let categoryType = "movie";
 
-  console.log("popular", popular);
+  let starList;
+
 
   useEffect(() => {
-    searchTmdbMovie("jones");
-    searchPopular();
+    getItemsSave(emailUser,"star",categoryType);
   }, []);
+
+  async function getItemsSave(email, section, category){
+    try {
+      //Data
+      //console.log("parametro="+params)
+      let user = email;
+      let dataType = section;
+      let keyValue = user + ":" + dataType;
+      let mediaType = category;
+
+      //GetItem - object
+      try{
+        let starGet = await AsyncStorage.getItem(keyValue);
+      starList = JSON.parse(starGet);
+      
+      }catch(err){console.log("EERRROOOO.....",err)}
+      
+      console.log("StarList ver o que tem....",starList)
+
+
+      let listTmdb = starList.map(async function (queryc){
+        try {
+          console.log("queryc.id....",queryc.id)
+          const response = await tmdb.get(`/${mediaType}/${queryc.id}`);
+          return response.data;
+        } catch (err) {
+          console.log("erro response...",err);
+        }
+
+      })
+      let listOjects = await Promise.all(listTmdb);
+
+      console.log('PROMISES ALL RESOLVED: ', listOjects);
+      setSaved(listOjects)
+
+    } catch (e) {
+      console.log("Ocorreu um erro: " + e);
+      let listObjectsEmpty = null;
+      setSaved(listObjectsEmpty)
+    }
+  };
 
   function getType(item) {
     if ("original_title" in item) {
@@ -36,88 +78,27 @@ const HomeScreen = ({ navigation }) => {
     }
   }
 
-  console.log(popular, results);
-  async function searchTmdbMovie(query) {
-    try {
-      const response = await tmdb.get("/search/movie", {
-        params: {
-          query,
-          include_adult: false,
-        },
-      });
-      setResults(response.data.results);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  async function searchTmdbTV(query) {
-    try {
-      const response = await tmdb.get("/search/tv", {
-        params: {
-          query,
-          include_adult: false,
-        },
-      });
-      setResults(response.data.results);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  async function searchTmdbPerson(query) {
-    try {
-      const response = await tmdb.get("/search/person", {
-        params: {
-          query,
-          include_adult: false,
-        },
-      });
-      setResults(response.data.results);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  async function searchPopular() {
-    try {
-      const response = await tmdb.get("/movie/popular");
-      console.log(response);
-      setPopular(response.data.results);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  console.log(popular);
   return (
     <>
       <View style={styles.container}>
-        <SearchBar
-          onChangeText={(t) => setText(t)}
-          onEndEditing={(t) => searchTmdbMovie(t)}
-          value={text}
-        />
         <View style={styles.filter}>
-          <TouchableOpacity onPress={() => searchTmdbMovie(text)}>
-            <BtnFilter value="Movies" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => searchTmdbTV(text)}>
-            <BtnFilter value="TV" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => searchTmdbPerson(text)}>
-            <BtnFilter value="People" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("Save")}>
+          <TouchableOpacity onPress={() => getItemsSave(emailUser,"star",categoryType)}>
             <BtnFilter value="Favoritos" />
           </TouchableOpacity>
-        </View>
-        <View>
-          <Slide list={popular} />
+
+          <TouchableOpacity onPress={() => getItemsSave(emailUser,"watch",categoryType)}>
+            <BtnFilter value="Assistir mais tarde" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => getItemsSave(emailUser,"like",categoryType)}>
+            <BtnFilter value="Curtidos" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => getItemsSave(emailUser,"dislike",categoryType)}>
+            <BtnFilter value="Não curtidos" />
+          </TouchableOpacity>
         </View>
 
         <FlatList
-          data={results}
+          data={saved}
           keyExtractor={(item) => `${item.id.toString}`}
           renderItem={({ item }) => {
             return (
@@ -213,4 +194,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default SaveScreen;
