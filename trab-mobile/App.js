@@ -2,7 +2,6 @@ import * as React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { navigationRef } from "./RootNavigation";
-
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import InitialScreen from "./src/screens/InitialScreen";
 import HomeScreen from "./src/screens/HomeScreen";
@@ -10,7 +9,6 @@ import LoginScreen from "./src/screens/LoginScreen";
 import CadastroScreen from "./src/screens/CadastroScreen";
 import DetailsScreen from "./src/screens/DetailsScreen";
 import SaveScreen from "./src/screens/SaveScreen";
-import { navigationRef } from "./RootNavigation";
 import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
 import {
   initialWindowMetrics,
