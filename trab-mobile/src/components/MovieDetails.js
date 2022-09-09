@@ -8,6 +8,7 @@ import {
   ImageBackground,
   TouchableOpacity,
   Linking,
+  Alert,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import BtnFilter from "./BtnFilter";
@@ -30,92 +31,66 @@ const MovieDetails = ({ type }) => {
 
   async function save(typeId, section) {
     try {
-      let itemId = typeId;
 
       //Data
-
+      let user = "username@email.com";
+      let itemId = typeId;
       let itemToAdd = { id: itemId };
       let itemToRemove = parseInt(itemId);
-      let user = "username@email.com";
       let dataType = section;
       let keyUser = user + ":" + dataType;
-
-      //GetItem - object
-      let starGet = await AsyncStorage.getItem(keyUser);
       let starListObj = [{}];
       let result;
+      let title;
 
-      //SetItem First time??? - string
+      if(section=='star'){title='favoritos'}
+      if(section=='watch'){title='assistir mais tarde'}
+      if(section=='like'){title='curtidos'}
+      if(section=='dislike'){title='não curtidos'}
+
+      //GetItem from AsyncStorage to get favorite movies
+      let starGet = await AsyncStorage.getItem(keyUser);
+
+      //Verify if AsyncStorage return null or if there are favorite movies
       if (starGet === null) {
-        console.log("Null.. -2");
-
         result = -2;
-        //let starOriginal = [];
-        //let starSet = JSON.stringify(starOriginal)
-        //await AsyncStorage.setItem(keyUser, starSet);
-        //starGet = await AsyncStorage.getItem(keyUser);
       } else {
-        console.log("não eh null");
-
+        //If there are favorite movies, try to find the id of the movie clicked among them
         starListObj = JSON.parse(starGet);
-
-        console.log("starListOj eh...", starListObj)
-        console.log("sitemId eh...", itemId)
-
-        try {
-          //starListObj = [{id:1},{id:2}]
-          //console.log("result antes...", result)
-          result = starListObj.findIndex((x) => x.id === itemId);
-          console.log("result dps...", result)
-        } catch (err) {
-          console.log("Erro... ", err);
-        }
-
-        //console.log("resultado......")
-        console.log("Encontrou no AsyncStorage? ", result);
-        //console.log("Lista antiga: ")
-        //console.log(starListObj)
+        result = starListObj.findIndex((x) => x.id === itemId);
+        console.log("Encontrou o filme clicado no AsyncStorage? ", result);
       }
 
-      console.log("itemToAdd..." , itemToAdd)
-
+      //Add movie to AsyncStorage if it can't find the selected movie id among the favorite ones
       if (result === -1) {
-        //Add item - object
         starListObj.splice(0, 0, itemToAdd);
-        console.log("-1, n null mas vazio. Logo splice")
+        console.log("Novo item adicionado ao AsyncStorage: ",itemToAdd);
+        Alert.alert("Adicionado em "+title+"!");
       }
+      //Add movie to AsyncStorage if there are no favorite movies list
       if (result === -2) {
         starListObj = [itemToAdd];
-        console.log("-2, null, logo setar primeira vez")
+        console.log("Primeiro item adicionado ao AsyncStorage: ",itemToAdd);
+        Alert.alert("Adicionado em "+title+"!");
       }
+      //Remove movie from AsyncStorage if can find the selected movie id among the favorite ones
       if(result >= 0) {
-        //Remove item by id - object
-        const itemRemoved = starListObj.splice(
-          starListObj.findIndex((x) => x.id === itemToRemove),
-          1
-        );
-        console.log("else, já existe. Remover...")
-
-        console.log("Item removido: ");
-        console.log(itemRemoved);
+        const itemRemoved = starListObj.splice(starListObj.findIndex((x) => x.id === itemToRemove),1);
+        console.log("Item removido do AsyncStorage: ",itemRemoved);
+        Alert.alert("Removido de "+title+"!");
       }
 
-      console.log("Lista final para ir ao async: ");
-      console.log(starListObj);
-
-      //SetItem New - string
+      //SetItem to update AsyncStorage with new movies
       let starSetNew = JSON.stringify(starListObj);
       await AsyncStorage.setItem(keyUser, starSetNew);
 
-      //GetItem - object
+      //GetItem to get the movie list from AsyncStorage
       let starGetNew = await AsyncStorage.getItem(keyUser);
       let starListNew = JSON.parse(starGetNew);
+      console.log("Lista nova do "+keyUser,starListNew);
 
-      console.log("Lista nova: ");
-      console.log(starListNew);
-
-      //Remove Item storage
-     // await AsyncStorage.removeItem(keyUser)
+      //Remove all Items from AsyncStorage from a keyUser
+      //await AsyncStorage.removeItem(keyUser)
 
     } catch (e) {
       console.log("Ocorreu um erro: " + e);

@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Colors } from "../../assets/scripts/colors.js";
@@ -19,12 +20,11 @@ const SaveScreen = ({ navigation }) => {
   const [saved, setSaved] = useState([]);
   let emailUser = "username@email.com";
   let categoryType = "movie";
-
+  const count = "star";
   let starList;
 
-
   useEffect(() => {
-    getItemsSave(emailUser,"star",categoryType);
+    getItemsSave(emailUser,count,categoryType);
   }, []);
 
 
@@ -40,6 +40,12 @@ const SaveScreen = ({ navigation }) => {
       let keyUser = user + ":" + dataType;
       let starListObj = [{}];
       let result;
+      let title;
+
+      if(section=='star'){title='favoritos'}
+      if(section=='watch'){title='assistir mais tarde'}
+      if(section=='like'){title='curtidos'}
+      if(section=='dislike'){title='não curtidos'}
 
       //GetItem from AsyncStorage to get favorite movies
       let starGet = await AsyncStorage.getItem(keyUser);
@@ -58,16 +64,19 @@ const SaveScreen = ({ navigation }) => {
       if (result === -1) {
         starListObj.splice(0, 0, itemToAdd);
         console.log("Novo item adicionado ao AsyncStorage: ",itemToAdd);
+        Alert.alert("Adicionado em "+title+"!");
       }
       //Add movie to AsyncStorage if there are no favorite movies list
       if (result === -2) {
         starListObj = [itemToAdd];
         console.log("Primeiro item adicionado ao AsyncStorage: ",itemToAdd);
+        Alert.alert("Adicionado em "+title+"!");
       }
       //Remove movie from AsyncStorage if can find the selected movie id among the favorite ones
       if(result >= 0) {
         const itemRemoved = starListObj.splice(starListObj.findIndex((x) => x.id === itemToRemove),1);
         console.log("Item removido do AsyncStorage: ",itemRemoved);
+        Alert.alert("Removido de "+title+"!");
       }
 
       //SetItem to update AsyncStorage with new movies
@@ -86,6 +95,7 @@ const SaveScreen = ({ navigation }) => {
       console.log("Ocorreu um erro: " + e);
     }
   }
+
   async function getItemsSave(email, section, category){
     try {
       //Data
@@ -102,12 +112,8 @@ const SaveScreen = ({ navigation }) => {
       
       }catch(err){console.log("EERRROOOO.....",err)}
       
-      console.log("StarList ver o que tem....",starList)
-
-
       let listTmdb = starList.map(async function (queryc){
         try {
-          console.log("queryc.id....",queryc.id)
           const response = await tmdb.get(`/${mediaType}/${queryc.id}`);
           return response.data;
         } catch (err) {
@@ -116,8 +122,6 @@ const SaveScreen = ({ navigation }) => {
 
       })
       let listOjects = await Promise.all(listTmdb);
-
-      console.log('PROMISES ALL RESOLVED: ', listOjects);
       setSaved(listOjects)
 
     } catch (e) {
@@ -141,18 +145,18 @@ const SaveScreen = ({ navigation }) => {
     <>
       <View style={styles.container}>
         <View style={styles.filter}>
-          <TouchableOpacity onPress={() => getItemsSave(emailUser,"star",categoryType)}>
+          <TouchableOpacity style={styles.btnFav} onPress={() => getItemsSave(emailUser,"star",categoryType)}>
             <BtnFilter value="Favoritos" />
           </TouchableOpacity>
+          <TouchableOpacity style={styles.btnFav} onPress={() => getItemsSave(emailUser,"watch",categoryType)}>
+            <BtnFilter value="Pretendo ver" />
+          </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => getItemsSave(emailUser,"watch",categoryType)}>
-            <BtnFilter value="Assistir mais tarde" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => getItemsSave(emailUser,"like",categoryType)}>
-            <BtnFilter value="Curtidos" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => getItemsSave(emailUser,"dislike",categoryType)}>
+          <TouchableOpacity style={styles.btnFav} onPress={() => getItemsSave(emailUser,"dislike",categoryType)}>
             <BtnFilter value="Não curtidos" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.btnFav} onPress={() => getItemsSave(emailUser,"like",categoryType)}>
+            <BtnFilter value="Curtidos" />
           </TouchableOpacity>
         </View>
 
@@ -213,6 +217,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignSelf: "center",
     alignContent: "space-between",
+  },
+  btnFav:{
+    padding:0,
+    margin:0,
   },
   card: {
     alignSelf: "center",

@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Colors } from "../../assets/scripts/colors.js";
@@ -40,6 +41,12 @@ const HomeScreen = ({ navigation }) => {
       let keyUser = user + ":" + dataType;
       let starListObj = [{}];
       let result;
+      let title;
+
+      if(section=='star'){title='favoritos'}
+      if(section=='watch'){title='assistir mais tarde'}
+      if(section=='like'){title='curtidos'}
+      if(section=='dislike'){title='não curtidos'}
 
       //GetItem from AsyncStorage to get favorite movies
       let starGet = await AsyncStorage.getItem(keyUser);
@@ -58,16 +65,19 @@ const HomeScreen = ({ navigation }) => {
       if (result === -1) {
         starListObj.splice(0, 0, itemToAdd);
         console.log("Novo item adicionado ao AsyncStorage: ",itemToAdd);
+        Alert.alert("Adicionado em "+title+"!");
       }
       //Add movie to AsyncStorage if there are no favorite movies list
       if (result === -2) {
         starListObj = [itemToAdd];
         console.log("Primeiro item adicionado ao AsyncStorage: ",itemToAdd);
+        Alert.alert("Adicionado em "+title+"!");
       }
       //Remove movie from AsyncStorage if can find the selected movie id among the favorite ones
       if(result >= 0) {
         const itemRemoved = starListObj.splice(starListObj.findIndex((x) => x.id === itemToRemove),1);
         console.log("Item removido do AsyncStorage: ",itemRemoved);
+        Alert.alert("Removido de "+title+"!");
       }
 
       //SetItem to update AsyncStorage with new movies
