@@ -13,6 +13,7 @@ import SearchBar from "../components/SearchBar";
 import BtnFilter from "../components/BtnFilter";
 import tmdb from "../api/tmdb";
 import Slide from "../components/Slide.js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const HomeScreen = ({ navigation }) => {
   const [text, setText] = useState("");
@@ -25,6 +26,66 @@ const HomeScreen = ({ navigation }) => {
     searchTmdbMovie("jones");
     searchPopular();
   }, []);
+
+
+  async function save(typeId, section) {
+    try {
+
+      //Data
+      let user = "username@email.com";
+      let itemId = typeId;
+      let itemToAdd = { id: itemId };
+      let itemToRemove = parseInt(itemId);
+      let dataType = section;
+      let keyUser = user + ":" + dataType;
+      let starListObj = [{}];
+      let result;
+
+      //GetItem from AsyncStorage to get favorite movies
+      let starGet = await AsyncStorage.getItem(keyUser);
+
+      //Verify if AsyncStorage return null or if there are favorite movies
+      if (starGet === null) {
+        result = -2;
+      } else {
+        //If there are favorite movies, try to find the id of the movie clicked among them
+        starListObj = JSON.parse(starGet);
+        result = starListObj.findIndex((x) => x.id === itemId);
+        console.log("Encontrou o filme clicado no AsyncStorage? ", result);
+      }
+
+      //Add movie to AsyncStorage if it can't find the selected movie id among the favorite ones
+      if (result === -1) {
+        starListObj.splice(0, 0, itemToAdd);
+        console.log("Novo item adicionado ao AsyncStorage: ",itemToAdd);
+      }
+      //Add movie to AsyncStorage if there are no favorite movies list
+      if (result === -2) {
+        starListObj = [itemToAdd];
+        console.log("Primeiro item adicionado ao AsyncStorage: ",itemToAdd);
+      }
+      //Remove movie from AsyncStorage if can find the selected movie id among the favorite ones
+      if(result >= 0) {
+        const itemRemoved = starListObj.splice(starListObj.findIndex((x) => x.id === itemToRemove),1);
+        console.log("Item removido do AsyncStorage: ",itemRemoved);
+      }
+
+      //SetItem to update AsyncStorage with new movies
+      let starSetNew = JSON.stringify(starListObj);
+      await AsyncStorage.setItem(keyUser, starSetNew);
+
+      //GetItem to get the movie list from AsyncStorage
+      let starGetNew = await AsyncStorage.getItem(keyUser);
+      let starListNew = JSON.parse(starGetNew);
+      console.log("Lista nova do "+keyUser,starListNew);
+
+      //Remove all Items from AsyncStorage from a keyUser
+      //await AsyncStorage.removeItem(keyUser)
+
+    } catch (e) {
+      console.log("Ocorreu um erro: " + e);
+    }
+  }
 
   function getType(item) {
     if ("original_title" in item) {
@@ -108,9 +169,6 @@ const HomeScreen = ({ navigation }) => {
           <TouchableOpacity onPress={() => searchTmdbPerson(text)}>
             <BtnFilter value="People" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("Save")}>
-            <BtnFilter value="Favoritos" />
-          </TouchableOpacity>
         </View>
         <View>
           <Slide list={popular} />
@@ -143,25 +201,18 @@ const HomeScreen = ({ navigation }) => {
                   </Text>
                 </TouchableOpacity>
                 <View style={styles.btns}>
-                  <TouchableOpacity onPress={() => console.log("favoritou")}>
-                    <Feather name="star" size={22} color="#a4d7c8" />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => console.log("curtiu")}>
-                    <Feather name="thumbs-up" size={20} color="#a4d7c8" />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => console.log("não curtiu")}>
-                    <Feather name="thumbs-down" size={20} color="#a4d7c8" />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() =>
-                      navigation.navigate("Details", {
-                        id: item.id,
-                        type: getType(item),
-                      })
-                    }
-                  >
-                    <Feather name="plus-circle" size={20} color="#a4d7c8" />
-                  </TouchableOpacity>
+                <TouchableOpacity onPress={() => save(item.id, "star")}>
+              <Feather name="star" size={27} color="#a4d7c8" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => save(item.id, "like")}>
+              <Feather name="thumbs-up" size={27} color="#a4d7c8" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => save(item.id, "dislike")}>
+              <Feather name="thumbs-down" size={27} color="#a4d7c8" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => save(item.id, "watch")}>
+              <Feather name="plus-circle" size={27} color="#a4d7c8" />
+            </TouchableOpacity>
                 </View>
               </View>
             );
