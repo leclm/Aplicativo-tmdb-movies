@@ -4,13 +4,14 @@ import { Feather } from "@expo/vector-icons";
 import { Colors } from "../../assets/scripts/colors.js";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import firebase from '../api/firebaseConnection';
+import { useAlerts } from "react-native-paper-alerts";
 import { useNavigation } from '@react-navigation/native';
 
 export default function LoginScreen(){
     const navigation = useNavigation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-  
+    const alerts = useAlerts();
     async function logar(){
       await firebase.auth().signInWithEmailAndPassword(email, password)
       .then( (value) => {
@@ -19,7 +20,7 @@ export default function LoginScreen(){
   
       })
       .catch( (error) => {
-          alert('Ops algo deu errado!');
+        alerts.alert('Algo deu errado no login! Tente novamente.');
           return;
           //Der algum erro mostrar o alert e barrar aqui.
       })
@@ -98,9 +99,8 @@ export default function LoginScreen(){
             </TouchableOpacity>
             </View>
             <View style={styles.txtTipo2}>
-                <Text>Não tem uma conta? </Text>
                 <TouchableOpacity onPress={ () => navigation.navigate('Cadastro')}>
-                     <Text color="#0000ff">Registre-se</Text>
+                     <Text style={styles.register} >Não tem uma conta? Registre-se</Text>
                  </TouchableOpacity>
             </View>
             
@@ -135,6 +135,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 30,
   },
+  register:{
+     color: '#ffffff',
+  },
   tipodeentrada: {
     width: 180,
     flexDirection: "row",
@@ -168,7 +171,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   txtTipo2: {
-    color: "#6bada0",
+    color: "#ffffff",
     textAlign: "center",
     flexDirection: "row",
     justifyContent: 'center',

@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Button, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
+import { useAlerts } from "react-native-paper-alerts";
 import firebase from '../api/firebaseConnection';
 
 export default function CadastroScreen(){
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const alerts = useAlerts();
 
   async function cadastrar(){
     await firebase.auth().createUserWithEmailAndPassword(email, password)
@@ -16,7 +17,7 @@ export default function CadastroScreen(){
       //Navegando usuario para Home e levando o email do usuario para a tela home
     })
     .catch( (error) => {
-        alert('Ops algo deu errado!');
+        alerts.alert('Algo deu errado no cadastro! Tente novamente.');
         console.log(error);
         return;
     })

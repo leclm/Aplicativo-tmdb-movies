@@ -16,6 +16,7 @@ import tmdb from "../api/tmdb";
 import Slide from "../components/Slide.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAlerts } from "react-native-paper-alerts";
+import { useIsFocused } from '@react-navigation/native';
 
 const HomeScreen = ({ navigation }) => {
   const [text, setText] = useState("");
@@ -25,12 +26,15 @@ const HomeScreen = ({ navigation }) => {
   const alerts = useAlerts();
   let emailUser = "username@email.com";
 
-  console.log("popular", popular);
-
   useEffect(() => {
     searchTmdbMovie("tecnologia");
     searchPopular();
   }, []);
+
+  
+    const isFocused = useIsFocused();
+    isFocused ? searchPopular() : console.log("left the page")
+  
 
   async function setItemSave(typeId, section) {
     try {
@@ -122,38 +126,9 @@ const HomeScreen = ({ navigation }) => {
     }
   }
 
-  console.log(popular, results);
   async function searchTmdbMovie(query) {
     try {
       const response = await tmdb.get("/search/movie", {
-        params: {
-          query,
-          include_adult: false,
-        },
-      });
-      setResults(response.data.results);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  async function searchTmdbTV(query) {
-    try {
-      const response = await tmdb.get("/search/tv", {
-        params: {
-          query,
-          include_adult: false,
-        },
-      });
-      setResults(response.data.results);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  async function searchTmdbPerson(query) {
-    try {
-      const response = await tmdb.get("/search/person", {
         params: {
           query,
           include_adult: false,
@@ -175,7 +150,6 @@ const HomeScreen = ({ navigation }) => {
     }
   }
 
-  console.log(popular);
   return (
     <>
       <View style={styles.container}>
