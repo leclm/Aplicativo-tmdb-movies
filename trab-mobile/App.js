@@ -9,6 +9,7 @@ import LoginScreen from "./src/screens/LoginScreen";
 import CadastroScreen from "./src/screens/CadastroScreen";
 import DetailsScreen from "./src/screens/DetailsScreen";
 import SaveScreen from "./src/screens/SaveScreen";
+import LogoutScreen from "./src/screens/LogoutScreen";
 import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
 import {
   initialWindowMetrics,
@@ -31,6 +32,8 @@ function Start() {
             iconName = "ios-home";
           } else if (route.name === "Meus filmes") {
             iconName = "ios-folder-open";
+          } else if (route.name === "Sair") {
+            iconName = "ios-log-out";
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -47,6 +50,11 @@ function Start() {
       <Tab.Screen
         name="Meus filmes"
         component={SaveScreen}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Sair"
+        component={LogoutScreen}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>
