@@ -10,7 +10,7 @@ const SearchBar = ({ onChangeText, onEndEditing, value }) => {
       <TextInput
         autoCapitalize="none"
         autoCorrect={false}
-        placeholder="Search"
+        placeholder="Buscar filmes"
         style={styles.textInput}
         value={value}
         onChangeText={(newText) => onChangeText(newText)}
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     flex: 1,
     marginLeft: 10,
-    color: Colors.white,
+    color: '#c4c4c4',
   },
 });
 
