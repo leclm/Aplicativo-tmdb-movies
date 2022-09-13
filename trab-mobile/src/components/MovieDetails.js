@@ -25,7 +25,7 @@ const MovieDetails = ({ type }) => {
   const [credits, setCredits] = useState([]);
   const [similiar, setSimiliar] = useState([]);
   const alerts = useAlerts();
-  let emailUser = "username@email.com";
+  let emailUser = global.user;
 
   useEffect(() => {
     content();

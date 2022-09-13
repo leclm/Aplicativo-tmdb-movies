@@ -7,6 +7,7 @@ import firebase from '../api/firebaseConnection';
 import { useAlerts } from "react-native-paper-alerts";
 import { useNavigation } from '@react-navigation/native';
 
+
 export default function LoginScreen(){
     const navigation = useNavigation();
     const [email, setEmail] = useState('');
@@ -15,6 +16,7 @@ export default function LoginScreen(){
     async function logar(){
       await firebase.auth().signInWithEmailAndPassword(email, password)
       .then( (value) => {
+       global.user = value.user.email;
        navigation.navigate('Start', { user: value.user.email })
        //Navegando usuario para Home e levando o email do usuario para a tela home
   

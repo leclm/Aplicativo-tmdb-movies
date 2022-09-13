@@ -13,7 +13,8 @@ export default function CadastroScreen(){
   async function cadastrar(){
     await firebase.auth().createUserWithEmailAndPassword(email, password)
     .then( (value) => {
-      navigation.navigate('Home', { user: value.user.email })
+      global.user = value.user.email;
+      navigation.navigate('Start', { user: value.user.email })
       //Navegando usuario para Home e levando o email do usuario para a tela home
     })
     .catch( (error) => {

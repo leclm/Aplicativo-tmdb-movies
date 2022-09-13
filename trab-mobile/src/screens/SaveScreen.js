@@ -19,7 +19,7 @@ import { useAlerts } from "react-native-paper-alerts";
 const SaveScreen = ({ navigation }) => {
   const [saved, setSaved] = useState([]);
   const [update, setUpdate] = useState([]);
-  let emailUser = "username@email.com";
+  let emailUser = global.user;
   let categoryType = "movie";
   let starList;
 
@@ -272,7 +272,7 @@ const SaveScreen = ({ navigation }) => {
               <View style={styles.card}>
                 <TouchableOpacity
                   onPress={() =>
-                    navigation.navigate("Details", {
+                    navigation.navigate("Detalhes do filme:", {
                       id: item.id,
                       type: getType(item),
                     })

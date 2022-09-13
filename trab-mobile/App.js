@@ -65,7 +65,7 @@ function App() {
               <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
               <Stack.Screen name="Cadastro" component={CadastroScreen} />
               <Stack.Screen name="Start" component={Start} options={{ headerShown: false }} />
-              <Stack.Screen name="Details" component={DetailsScreen} />
+              <Stack.Screen name="Detalhes do filme:" component={DetailsScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </AlertsProvider>

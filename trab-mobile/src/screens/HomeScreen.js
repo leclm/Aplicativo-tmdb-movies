@@ -18,13 +18,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAlerts } from "react-native-paper-alerts";
 import { useIsFocused } from '@react-navigation/native';
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation, route }) => {
   const [text, setText] = useState("");
   const [results, setResults] = useState([]);
   const [popular, setPopular] = useState([]);
 
   const alerts = useAlerts();
-  let emailUser = "username@email.com";
+
+  let emailUser = global.user;
 
   useEffect(() => {
     searchTmdbMovie("tecnologia");
@@ -33,9 +34,8 @@ const HomeScreen = ({ navigation }) => {
 
   
     const isFocused = useIsFocused();
-    isFocused ? searchPopular() : console.log("left the page")
+   // isFocused ? searchPopular() : console.log("left the page")
   
-
   async function setItemSave(typeId, section) {
     try {
       //Data
@@ -171,7 +171,7 @@ const HomeScreen = ({ navigation }) => {
               <View style={styles.card}>
                 <TouchableOpacity
                   onPress={() =>
-                    navigation.navigate("Details", {
+                    navigation.navigate("Detalhes do filme:", {
                       id: item.id,
                       type: getType(item),
                     })
