@@ -1,19 +1,10 @@
-# Trabalho Final
+# App para favoritar filmes usando React Native
 
+Trabalho da disciplina de Desenvolvimento para Dispositivos Móveis do curso de Tecnologia em Análise e Desenvolvimento de Sistemas da UFPR. O objetivo é o desenvolvimento de um aplicativo feito em React Native que permita realizar a busca de filmes e principalmente salvar os favoritos. Foi utilizada a API do TMDB, a autenticação com o firebase e o AsyncStorage para salvar as informações.
 
+![](tmdb-ddm.png)
 
 ## Getting started
 
-Após clonar o repositório, instale as dependencias:
-
 - npm install
-- npm install @react-navigation/native
-- expo install react-native-screens react-native-safe-area-context
-- npm install @react-navigation/native-stack
-- npm install react-native-dotenv
-- npm install axios
-- npm install redux react-redux
-- npm install react-native-snap-carousel 
-- npm install react-style-proptype
-
 - expo start
